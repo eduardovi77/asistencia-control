@@ -924,7 +924,69 @@
   }
 
   // ══════════════════════════════════════════════════════════════
-  //  ESTADO GLOBAL
+  //  CACHE DE EMPLEADOS — sessionStorage con expiración 4 horas
+  // ══════════════════════════════════════════════════════════════
+  const CACHE_KEY = 'empleados_cache';
+  const CACHE_TTL = 4 * 60 * 60 * 1000; // 4 horas en ms
+
+  function guardarCache(data) {
+    try {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+        timestamp: Date.now(),
+        empleados: data
+      }));
+    } catch(e) {}
+  }
+
+  function cargarCache() {
+    try {
+      const raw = sessionStorage.getItem(CACHE_KEY);
+      if (!raw) return null;
+      const cache = JSON.parse(raw);
+      if (Date.now() - cache.timestamp > CACHE_TTL) {
+        sessionStorage.removeItem(CACHE_KEY);
+        return null;
+      }
+      return cache.empleados;
+    } catch(e) { return null; }
+  }
+
+  function aplicarEmpleados(data) {
+    empleados = {};
+    data.forEach(emp => {
+      empleados[String(emp.codigo).trim()] = {
+        nombre: emp.nombre,
+        sector: emp.sector,
+        estado: String(emp.estado).trim().toUpperCase()
+      };
+    });
+    estadoDia = {};
+    actualizarContador();
+
+    const total = Object.keys(empleados).length;
+    const st = document.getElementById('statusEmpleados');
+    st.textContent = total + ' empleados cargados';
+    st.className = 'loaded';
+
+    // Cargar select de filtros en reportes
+    const sel = document.getElementById('fEmpleado');
+    sel.innerHTML = '<option value="">Todos</option>';
+    Object.entries(empleados).forEach(([cod, e]) => {
+      const o = document.createElement('option');
+      o.value = cod; o.textContent = e.nombre;
+      sel.appendChild(o);
+    });
+  }
+
+  // Intentar cargar desde cache al iniciar
+  function iniciarCache() {
+    const cached = cargarCache();
+    if (cached) {
+      aplicarEmpleados(cached);
+      mostrarMensaje('ok', 'Empleados cargados desde cache');
+      setTimeout(() => input.focus(), 100);
+    }
+  }
   // ══════════════════════════════════════════════════════════════
   let empleados  = {};
   let estadoDia  = {};
@@ -993,29 +1055,10 @@
       btn.disabled = false; icon.classList.remove('spin');
       try {
         if (!data.ok) throw new Error(data.error || 'Error desconocido');
-        empleados = {};
-        data.empleados.forEach(emp => {
-          empleados[String(emp.codigo).trim()] = {
-            nombre: emp.nombre, sector: emp.sector,
-            estado: String(emp.estado).trim().toUpperCase()
-          };
-        });
-        estadoDia = {};
-        actualizarContador();
+        aplicarEmpleados(data.empleados);
+        guardarCache(data.empleados); // guardar en cache
         const total = Object.keys(empleados).length;
-        const st = document.getElementById('statusEmpleados');
-        st.textContent = total + ' empleados cargados';
-        st.className = 'loaded';
         mostrarMensaje('ok', total + ' empleados cargados correctamente');
-
-        // Cargar empleados en el select de filtros
-        const sel = document.getElementById('fEmpleado');
-        sel.innerHTML = '<option value="">Todos</option>';
-        Object.entries(empleados).forEach(([cod, e]) => {
-          const o = document.createElement('option');
-          o.value = cod; o.textContent = e.nombre;
-          sel.appendChild(o);
-        });
       } catch(err) {
         mostrarMensaje('error', 'Error: ' + err.message);
       }
@@ -1131,6 +1174,9 @@
   const hoy = new Date().toISOString().split('T')[0];
   document.getElementById('fDesde').value = hoy;
   document.getElementById('fHasta').value = hoy;
+
+  // Cargar empleados desde cache si está disponible
+  if (sessionStorage.getItem('auth') === '1') iniciarCache();
 </script>
 </body>
 </html>
