@@ -422,6 +422,129 @@
     }
     #statusEmpleados.loaded { color: var(--green-t); }
 
+    /* ── Scanner activo: LED + pulso borde ── */
+    .scan-label-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .led-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-t);
+      box-shadow: 0 0 6px var(--green-t);
+      flex-shrink: 0;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .led-dot.active {
+      opacity: 1;
+      animation: ledPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes ledPulse {
+      0%, 100% { opacity: 1;   box-shadow: 0 0 5px var(--green-t); }
+      50%       { opacity: .35; box-shadow: 0 0 2px var(--green-t); }
+    }
+    #codigoInput.scanner-active {
+      animation: borderPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes borderPulse {
+      0%, 100% { border-color: #1f6feb55; box-shadow: 0 0 0 0px #1f6feb00; }
+      50%       { border-color: #388bfd;   box-shadow: 0 0 0 3px #388bfd22; }
+    }
+
+    /* ══════════════════════════════════════
+       RADAR — ondas que se expanden
+    ══════════════════════════════════════ */
+    .radar-wrap {
+      position: relative;
+    }
+    .radar-ring {
+      position: absolute;
+      inset: -1px;
+      border-radius: 10px;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .radar-ring::before,
+    .radar-ring::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 10px;
+      border: 2px solid #388bfd;
+      opacity: 0;
+    }
+    .radar-ring.active::before {
+      animation: radarWave 2.4s ease-out infinite;
+    }
+    .radar-ring.active::after {
+      animation: radarWave 2.4s ease-out infinite .8s;
+    }
+    .radar-ring-extra {
+      position: absolute;
+      inset: 0;
+      border-radius: 10px;
+      border: 2px solid #388bfd;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .radar-ring.active .radar-ring-extra {
+      animation: radarWave 2.4s ease-out infinite 1.6s;
+    }
+    @keyframes radarWave {
+      0%   { opacity: .7; transform: scale(1); }
+      100% { opacity: 0;  transform: scale(1.06); }
+    }
+
+    /* ══════════════════════════════════════
+       MATRIX — canvas de fondo
+    ══════════════════════════════════════ */
+    #matrixCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity .6s;
+      pointer-events: none;
+      z-index: 0;
+    }
+    #matrixCanvas.active { opacity: .06; }
+    .scan-card { position: relative; overflow: hidden; }
+    .scan-card > * { position: relative; z-index: 1; }
+
+    /* ══════════════════════════════════════
+       SCANLINE — línea que barre el input
+    ══════════════════════════════════════ */
+    .scanline-wrap {
+      position: relative;
+    }
+    .scanline {
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, #388bfd 30%, #7dd3fc 50%, #388bfd 70%, transparent 100%);
+      border-radius: 2px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 2;
+      filter: blur(0.5px);
+      box-shadow: 0 0 8px #388bfd, 0 0 16px #388bfd88;
+    }
+    .scanline.active {
+      opacity: 1;
+      animation: scanlineMove 2s ease-in-out infinite;
+    }
+    @keyframes scanlineMove {
+      0%   { top: 0%;   opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+
     /* ── Tabla movimientos ── */
     .table-card {
       background: var(--surface);
@@ -858,11 +981,11 @@
 <div id="app">
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar collapsed" id="sidebar">
     <div class="sidebar-brand">
       <h1>BLACK</h1>
       <p>Asistencia</p>
-      <span style="font-size:0.62rem;color:#444d56;margin-top:4px;display:block;letter-spacing:1px">VERSION 1.67</span>
+      <span style="font-size:0.62rem;color:#444d56;margin-top:4px;display:block;letter-spacing:1px">VERSION 1.70</span>
     </div>
     <nav class="sidebar-nav">
       <button class="nav-item active" onclick="showPanel('scanner', this)">
@@ -887,7 +1010,7 @@
   </aside>
 
   <!-- Toggle sidebar -->
-  <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+  <button class="sidebar-toggle collapsed-btn" id="sidebarToggle" onclick="toggleSidebar()">
     <svg viewBox="0 0 10 10"><polyline points="7,2 3,5 7,8"/></svg>
   </button>
 
@@ -928,10 +1051,22 @@
       </div>
 
       <div class="scan-card">
+      <canvas id="matrixCanvas"></canvas>
+
+      <div class="scan-label-wrap">
+        <span class="led-dot" id="ledDot"></span>
         <label>Escanee o ingrese el codigo</label>
-        <input type="text" id="codigoInput" inputmode="none"
+      </div>
+
+      <div class="radar-wrap">
+        <div class="radar-ring" id="radarRing"><div class="radar-ring-extra"></div></div>
+        <div class="scanline-wrap">
+          <div class="scanline" id="scanline"></div>
+          <input type="text" id="codigoInput" inputmode="none"
                autocomplete="off" placeholder="_ _ _ _ _ _ _ _" maxlength="20"
                readonly onfocus="this.removeAttribute('readonly')" />
+        </div><!-- /scanline-wrap -->
+      </div><!-- /radar-wrap -->
         <div id="mensaje" class="idle">Listo para escanear</div>
         <button class="btn-secondary" id="btnActualizar" onclick="cargarEmpleados()">
           <span id="btnIcon">&#8635;</span> Actualizar empleados
@@ -1287,8 +1422,81 @@
   setInterval(actualizarReloj, 1000);
 
   // ══════════════════════════════════════════════════════════════
-  //  FOCO AUTOMATICO
+  //  SCANNER ACTIVO — LED + pulso borde + radar + matrix + scanline
   // ══════════════════════════════════════════════════════════════
+
+  // ── Matrix rain ──
+  const matrixCanvas = document.getElementById('matrixCanvas');
+  const mCtx = matrixCanvas.getContext('2d');
+  let matrixRunning = false;
+  let matrixAnim = null;
+  const matrixChars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ABCDEF';
+  let matrixDrops = [];
+
+  function initMatrix() {
+    const card = matrixCanvas.parentElement;
+    matrixCanvas.width  = card.offsetWidth;
+    matrixCanvas.height = card.offsetHeight;
+    const cols = Math.floor(matrixCanvas.width / 14);
+    matrixDrops = Array(cols).fill(1);
+  }
+
+  function drawMatrix() {
+    if (!matrixRunning) return;
+    mCtx.fillStyle = 'rgba(22,27,34,0.18)';
+    mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+    mCtx.fillStyle = '#3fb950';
+    mCtx.font = '12px monospace';
+    for (let i = 0; i < matrixDrops.length; i++) {
+      const ch = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+      mCtx.fillText(ch, i * 14, matrixDrops[i] * 14);
+      if (matrixDrops[i] * 14 > matrixCanvas.height && Math.random() > 0.975) matrixDrops[i] = 0;
+      matrixDrops[i]++;
+    }
+    matrixAnim = setTimeout(drawMatrix, 60);
+  }
+
+  function setScannerActivo(activo) {
+    const led    = document.getElementById('ledDot');
+    const inp    = document.getElementById('codigoInput');
+    const radar  = document.getElementById('radarRing');
+    const scan   = document.getElementById('scanline');
+    const mCv    = document.getElementById('matrixCanvas');
+
+    if (activo) {
+      led.classList.add('active');
+      inp.classList.add('scanner-active');
+      radar.classList.add('active');
+      scan.classList.add('active');
+      mCv.classList.add('active');
+      if (!matrixRunning) {
+        matrixRunning = true;
+        initMatrix();
+        drawMatrix();
+      }
+    } else {
+      led.classList.remove('active');
+      inp.classList.remove('scanner-active');
+      radar.classList.remove('active');
+      scan.classList.remove('active');
+      mCv.classList.remove('active');
+      if (matrixRunning) {
+        matrixRunning = false;
+        clearTimeout(matrixAnim);
+      }
+    }
+  }
+
+  // Verificar estado cada 500ms
+  setInterval(() => {
+    const loginVisible  = !document.getElementById('loginScreen').classList.contains('hidden');
+    const scannerActivo = document.getElementById('panelScanner').classList.contains('active');
+    const hayModal      = document.querySelector('.modal-overlay.visible');
+    const procesando    = document.getElementById('mensaje').className === 'warn';
+    setScannerActivo(!loginVisible && scannerActivo && !hayModal && !procesando);
+  }, 500);
+
+
   const input = document.getElementById('codigoInput');
 
   function mantenerFoco() {
