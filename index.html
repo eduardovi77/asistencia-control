@@ -267,6 +267,30 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .btn-fullscreen {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-fullscreen svg {
+      width: 14px; height: 14px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .btn-fullscreen:hover { border-color: var(--accent); color: var(--accent); }
     .topbar .clock-block { text-align: right; }
     .topbar .clock-block #reloj {
       font-size: 1.4rem;
@@ -511,6 +535,8 @@
     }
     .action-btn.edit  { background: transparent; border-color: var(--accent); color: var(--accent); }
     .action-btn.edit:hover  { background: var(--accent); color: #fff; }
+    .action-btn.cred  { background: transparent; border-color: var(--yellow); color: var(--yellow-t); }
+    .action-btn.cred:hover  { background: var(--yellow); color: #fff; }
     .action-btn.baja  { background: transparent; border-color: var(--red); color: var(--red-t); }
     .action-btn.baja:hover  { background: var(--red); color: #fff; }
     .action-btn.alta  { background: transparent; border-color: var(--green); color: var(--green-t); }
@@ -534,7 +560,9 @@
     .status-dot.inactivo { color: var(--muted); }
     .status-dot.inactivo::before { background: var(--muted); }
 
-    /* Modal */
+    /* ══════════════════════════════════════
+       MODALES
+    ══════════════════════════════════════ */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -544,9 +572,8 @@
       justify-content: center;
       z-index: 500;
     }
-    .modal-overlay.visible {
-      display: flex;
-    }
+    .modal-overlay.visible { display: flex; }
+
     .modal {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -617,13 +644,76 @@
     }
     .btn-save:hover { background: var(--accent-h); }
 
-    /* Confirmacion baja */
     .modal-confirm p {
       font-size: 0.92rem;
       color: var(--muted);
       line-height: 1.5;
     }
     .modal-confirm strong { color: var(--text); }
+
+    /* Modal credencial */
+    .modal-cred {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 28px 24px;
+      width: 100%;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .modal-cred h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 14px;
+    }
+    .cred-preview {
+      display: flex;
+      justify-content: center;
+    }
+    #carnetCanvas {
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+      max-width: 100%;
+    }
+    .cred-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-cred-dl {
+      flex: 1;
+      padding: 9px 14px;
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-cred-dl:hover { background: var(--accent-h); }
+    .btn-cred-wa {
+      flex: 1;
+      padding: 9px 14px;
+      background: #1a472a;
+      border: 1px solid var(--green);
+      border-radius: 6px;
+      color: var(--green-t);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-cred-wa:hover { background: var(--green); color: #fff; }
+
+    /* ══════════════════════════════════════
+       REPORTES
+    ══════════════════════════════════════ */
     .report-filters {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -730,10 +820,8 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Tabla horas */
     .hours-row td:last-child { font-family: monospace; font-weight: 600; color: var(--green-t); }
 
-    /* Ausentes */
     .absent-chip {
       display: inline-flex;
       align-items: center;
@@ -760,12 +848,7 @@
       <h1>BLACK</h1>
       <p>Control de Asistencia</p>
     </div>
-    <div class="login-field">
-      <label>Contraseña</label>
-      <input type="password" id="loginPass" placeholder="Ingrese su contraseña" />
-    </div>
-    <p class="login-error" id="loginError"></p>
-    <button class="btn-primary" onclick="intentarLogin()">Ingresar</button>
+    <button class="btn-primary" onclick="intentarLogin()">Acceder</button>
   </div>
 </div>
 
@@ -779,7 +862,7 @@
     <div class="sidebar-brand">
       <h1>BLACK</h1>
       <p>Asistencia</p>
-      <span style="font-size:0.62rem;color:#444d56;margin-top:4px;display:block;letter-spacing:1px">v 1.59</span>
+      <span style="font-size:0.62rem;color:#444d56;margin-top:4px;display:block;letter-spacing:1px">VERSION 1.67</span>
     </div>
     <nav class="sidebar-nav">
       <button class="nav-item active" onclick="showPanel('scanner', this)">
@@ -879,7 +962,6 @@
     <!-- Panel Reportes -->
     <div class="panel" id="panelReportes">
 
-      <!-- Filtros -->
       <div class="report-filters">
         <div class="filter-group">
           <label>Desde</label>
@@ -909,7 +991,6 @@
         <button class="btn-export" onclick="exportarExcel()">Exportar Excel</button>
       </div>
 
-      <!-- Stats resumen -->
       <div class="report-stats">
         <div class="rstat">
           <div class="rnum" id="rTotalDias">--</div>
@@ -929,7 +1010,6 @@
         </div>
       </div>
 
-      <!-- Tabs -->
       <div>
         <div class="tabs">
           <button class="tab active" onclick="showTab('tabHoras', this)">Horas por dia</button>
@@ -938,17 +1018,12 @@
           <button class="tab" onclick="showTab('tabAusentes', this)">Ausentes</button>
         </div>
 
-        <!-- Tab: Horas por dia -->
         <div class="tab-content active table-card" id="tabHoras" style="border-top:none;border-radius:0 0 10px 10px;">
           <table>
             <thead>
               <tr>
-                <th>Fecha</th>
-                <th>Empleado</th>
-                <th>Sector</th>
-                <th>Ingreso</th>
-                <th>Salida</th>
-                <th>Horas trabajadas</th>
+                <th>Fecha</th><th>Empleado</th><th>Sector</th>
+                <th>Ingreso</th><th>Salida</th><th>Horas trabajadas</th>
               </tr>
             </thead>
             <tbody id="bodyHoras">
@@ -957,16 +1032,12 @@
           </table>
         </div>
 
-        <!-- Tab: Resumen semanal -->
         <div class="tab-content table-card" id="tabSemanal" style="border-top:none;border-radius:0 0 10px 10px;">
           <table>
             <thead>
               <tr>
-                <th>Semana</th>
-                <th>Empleado</th>
-                <th>Dias trabajados</th>
-                <th>Total horas</th>
-                <th>Promedio diario</th>
+                <th>Semana</th><th>Empleado</th><th>Dias trabajados</th>
+                <th>Total horas</th><th>Promedio diario</th>
               </tr>
             </thead>
             <tbody id="bodySemanal">
@@ -975,17 +1046,12 @@
           </table>
         </div>
 
-        <!-- Tab: Movimientos -->
         <div class="tab-content table-card" id="tabMovimientos" style="border-top:none;border-radius:0 0 10px 10px;">
           <table>
             <thead>
               <tr>
-                <th>Fecha</th>
-                <th>Hora</th>
-                <th>Codigo</th>
-                <th>Nombre</th>
-                <th>Sector</th>
-                <th>Movimiento</th>
+                <th>Fecha</th><th>Hora</th><th>Codigo</th>
+                <th>Nombre</th><th>Sector</th><th>Movimiento</th>
               </tr>
             </thead>
             <tbody id="bodyMovimientos">
@@ -994,20 +1060,18 @@
           </table>
         </div>
 
-        <!-- Tab: Ausentes -->
         <div class="tab-content table-card" id="tabAusentes" style="border-top:none;border-radius:0 0 10px 10px;">
           <div class="absent-wrap" id="bodyAusentes">
             <p class="empty-state" style="width:100%">Seleccione un periodo y consulte</p>
           </div>
         </div>
-
       </div>
+
     </div><!-- /panelReportes -->
 
     <!-- Panel Empleados -->
     <div class="panel" id="panelEmpleados">
 
-      <!-- Toolbar -->
       <div class="emp-toolbar">
         <div class="emp-toolbar-left">
           <input class="search-input" type="text" id="empSearch"
@@ -1029,7 +1093,6 @@
         <button class="btn-new" onclick="abrirModalNuevo()">+ Nuevo empleado</button>
       </div>
 
-      <!-- Stats -->
       <div class="emp-stats">
         <div class="rstat">
           <div class="rnum" id="empTotalActivos">--</div>
@@ -1049,17 +1112,13 @@
         </div>
       </div>
 
-      <!-- Tabla -->
       <div class="table-card">
         <div class="table-header">Listado de empleados</div>
         <table>
           <thead>
             <tr>
-              <th>Codigo</th>
-              <th>Nombre</th>
-              <th>Sector</th>
-              <th>Estado</th>
-              <th>Acciones</th>
+              <th>Codigo</th><th>Nombre</th><th>Sector</th>
+              <th>Estado</th><th>Acciones</th>
             </tr>
           </thead>
           <tbody id="tablaEmpleados">
@@ -1070,69 +1129,76 @@
 
     </div><!-- /panelEmpleados -->
 
-    <!-- Modal nuevo/editar empleado -->
-    <div class="modal-overlay" id="modalEmpleado">
-      <div class="modal">
-        <h3 id="modalTitulo">Nuevo empleado</h3>
-        <div class="modal-fields">
-          <div class="modal-field">
-            <label>Codigo</label>
-            <input type="text" id="mCodigo" placeholder="Ej: 10000101" inputmode="numeric" />
-          </div>
-          <div class="modal-field">
-            <label>Nombre completo</label>
-            <input type="text" id="mNombre" placeholder="Apellido Nombre" />
-          </div>
-          <div class="modal-field">
-            <label>Sector</label>
-            <select id="mSector">
-              <option>Deposito</option>
-              <option>Ventas</option>
-              <option>Reparto</option>
-              <option>Administracion</option>
-            </select>
-          </div>
-          <div class="modal-field">
-            <label>Estado</label>
-            <select id="mEstado">
-              <option value="ACTIVO">Activo</option>
-              <option value="INACTIVO">Inactivo</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button class="btn-cancel" onclick="cerrarModal('modalEmpleado')">Cancelar</button>
-          <button class="btn-save" onclick="guardarEmpleado()">Guardar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal credencial -->
-    <div class="modal-overlay" id="modalCredencial">
-      <div class="modal-cred">
-        <h3>Credencial del empleado</h3>
-        <div class="cred-preview">
-          <canvas id="carnetCanvas" width="300" height="480"></canvas>
-        </div>
-        <div class="cred-actions">
-          <button class="btn-cred-dl" onclick="descargarCredencial()">Descargar PNG</button>
-          <button class="btn-cred-wa" onclick="compartirWhatsApp()">Enviar por WhatsApp</button>
-          <button class="btn-cancel"  onclick="cerrarModal('modalCredencial')">Cerrar</button>
-        </div>
-      </div>
-    </div>
-      <div class="modal modal-confirm">
-        <h3>Confirmar baja</h3>
-        <p>Esta por dar de baja a <strong id="bajaEmpleadoNombre"></strong>. El empleado quedara inactivo y no podra fichar asistencia.</p>
-        <div class="modal-actions">
-          <button class="btn-cancel" onclick="cerrarModal('modalBaja')">Cancelar</button>
-          <button class="btn-save" style="background:var(--red)" onclick="confirmarBaja()">Dar de baja</button>
-        </div>
-      </div>
-    </div>
-
   </div><!-- /main -->
 </div><!-- /app -->
+
+<!-- ══════════════════════════════════════
+     MODALES (fuera del layout)
+══════════════════════════════════════ -->
+
+<!-- Modal nuevo/editar empleado -->
+<div class="modal-overlay" id="modalEmpleado">
+  <div class="modal">
+    <h3 id="modalTitulo">Nuevo empleado</h3>
+    <div class="modal-fields">
+      <div class="modal-field">
+        <label>Codigo</label>
+        <input type="text" id="mCodigo" placeholder="Ej: 10000101" inputmode="numeric" />
+      </div>
+      <div class="modal-field">
+        <label>Nombre completo</label>
+        <input type="text" id="mNombre" placeholder="Apellido Nombre" />
+      </div>
+      <div class="modal-field">
+        <label>Sector</label>
+        <select id="mSector">
+          <option>Deposito</option>
+          <option>Ventas</option>
+          <option>Reparto</option>
+          <option>Administracion</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Estado</label>
+        <select id="mEstado">
+          <option value="ACTIVO">Activo</option>
+          <option value="INACTIVO">Inactivo</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal('modalEmpleado')">Cancelar</button>
+      <button class="btn-save"   onclick="guardarEmpleado()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal credencial -->
+<div class="modal-overlay" id="modalCredencial">
+  <div class="modal-cred">
+    <h3>Credencial del empleado</h3>
+    <div class="cred-preview">
+      <canvas id="carnetCanvas" width="300" height="500"></canvas>
+    </div>
+    <div class="cred-actions">
+      <button class="btn-cred-dl" onclick="descargarCredencial()">Descargar PNG</button>
+      <button class="btn-cred-wa" onclick="compartirWhatsApp()">Enviar por WhatsApp</button>
+      <button class="btn-cancel"  onclick="cerrarModal('modalCredencial')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Modal confirmar baja — CORREGIDO con id y overlay correcto -->
+<div class="modal-overlay" id="modalBaja">
+  <div class="modal modal-confirm">
+    <h3>Confirmar baja</h3>
+    <p>Esta por dar de baja a <strong id="bajaEmpleadoNombre"></strong>. El empleado quedara inactivo y no podra fichar asistencia.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal('modalBaja')">Cancelar</button>
+      <button class="btn-save"   style="background:var(--red)" onclick="confirmarBaja()">Dar de baja</button>
+    </div>
+  </div>
+</div>
 
 <script>
   // ══════════════════════════════════════════════════════════════
@@ -1142,6 +1208,9 @@
   const SECRET_KEY      = 'ZRoTWkPTq44048';
   const PASS            = 'black/7889/BLACK';
 
+  // ══════════════════════════════════════════════════════════════
+  //  SIDEBAR
+  // ══════════════════════════════════════════════════════════════
   function toggleSidebar() {
     const sb  = document.getElementById('sidebar');
     const btn = document.getElementById('sidebarToggle');
@@ -1155,14 +1224,12 @@
   function toggleFullscreen() {
     const el  = document.documentElement;
     const btn = document.getElementById('btnFullscreen');
-    const ico = document.getElementById('fsIcon');
-
     if (!document.fullscreenElement) {
       el.requestFullscreen && el.requestFullscreen();
-      btn.innerHTML = '<svg id="fsIcon" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg> Salir';
+      btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg> Salir';
     } else {
       document.exitFullscreen && document.exitFullscreen();
-      btn.innerHTML = '<svg id="fsIcon" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg> Pantalla completa';
+      btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg> Pantalla completa';
     }
   }
 
@@ -1170,21 +1237,11 @@
   //  LOGIN
   // ══════════════════════════════════════════════════════════════
   function intentarLogin() {
-    const p   = document.getElementById('loginPass').value.trim();
-    const err = document.getElementById('loginError');
-    if (p === PASS) {
-      sessionStorage.setItem('auth', '1');
-      document.getElementById('loginScreen').classList.add('hidden');
-      err.textContent = '';
-      setTimeout(() => input.focus(), 100);
-    } else {
-      err.textContent = 'Contrasena incorrecta';
-      document.getElementById('loginPass').value = '';
-    }
+    sessionStorage.setItem('auth', '1');
+    document.getElementById('loginScreen').classList.add('hidden');
+    setTimeout(() => input.focus(), 100);
   }
-  document.getElementById('loginPass').addEventListener('keydown', e => {
-    if (e.key === 'Enter') intentarLogin();
-  });
+
   if (sessionStorage.getItem('auth') === '1') {
     document.getElementById('loginScreen').classList.add('hidden');
   }
@@ -1235,45 +1292,42 @@
   const input = document.getElementById('codigoInput');
 
   function mantenerFoco() {
-    const loginVisible = !document.getElementById('loginScreen').classList.contains('hidden');
+    const loginVisible  = !document.getElementById('loginScreen').classList.contains('hidden');
     const scannerActivo = document.getElementById('panelScanner').classList.contains('active');
-    if (loginVisible || !scannerActivo) return;
+    const hayModalOpen  = document.querySelector('.modal-overlay.visible');
+    if (loginVisible || !scannerActivo || hayModalOpen) return;
     if (document.activeElement !== document.getElementById('btnActualizar')) input.focus();
   }
 
   document.addEventListener('click', mantenerFoco);
-  document.addEventListener('keydown', e => {
+  document.addEventListener('keydown', () => {
     const loginVisible  = !document.getElementById('loginScreen').classList.contains('hidden');
     const scannerActivo = document.getElementById('panelScanner').classList.contains('active');
-    if (!loginVisible && scannerActivo) input.focus();
+    const hayModalOpen  = document.querySelector('.modal-overlay.visible');
+    if (!loginVisible && scannerActivo && !hayModalOpen) input.focus();
   });
 
   // ══════════════════════════════════════════════════════════════
-  //  ANTI DOBLE ESCANEO — bloquea el mismo código por 3 segundos
+  //  ANTI DOBLE ESCANEO
   // ══════════════════════════════════════════════════════════════
-  const ultimoScaneo = {}; // { codigo: timestamp }
+  const ultimoScaneo = {};
 
   function esDuplicado(codigo) {
     const ahora = Date.now();
-    if (ultimoScaneo[codigo] && (ahora - ultimoScaneo[codigo]) < 3000) {
-      return true;
-    }
+    if (ultimoScaneo[codigo] && (ahora - ultimoScaneo[codigo]) < 3000) return true;
     ultimoScaneo[codigo] = ahora;
     return false;
   }
 
   // ══════════════════════════════════════════════════════════════
-  //  CACHE DE EMPLEADOS — sessionStorage con expiración 4 horas
+  //  CACHE DE EMPLEADOS
   // ══════════════════════════════════════════════════════════════
   const CACHE_KEY = 'empleados_cache';
-  const CACHE_TTL = 4 * 60 * 60 * 1000; // 4 horas en ms
+  const CACHE_TTL = 4 * 60 * 60 * 1000;
 
   function guardarCache(data) {
     try {
-      sessionStorage.setItem(CACHE_KEY, JSON.stringify({
-        timestamp: Date.now(),
-        empleados: data
-      }));
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), empleados: data }));
     } catch(e) {}
   }
 
@@ -1282,10 +1336,7 @@
       const raw = sessionStorage.getItem(CACHE_KEY);
       if (!raw) return null;
       const cache = JSON.parse(raw);
-      if (Date.now() - cache.timestamp > CACHE_TTL) {
-        sessionStorage.removeItem(CACHE_KEY);
-        return null;
-      }
+      if (Date.now() - cache.timestamp > CACHE_TTL) { sessionStorage.removeItem(CACHE_KEY); return null; }
       return cache.empleados;
     } catch(e) { return null; }
   }
@@ -1307,7 +1358,6 @@
     st.textContent = total + ' empleados cargados';
     st.className = 'loaded';
 
-    // Cargar select de filtros en reportes
     const sel = document.getElementById('fEmpleado');
     sel.innerHTML = '<option value="">Todos</option>';
     Object.entries(empleados).forEach(([cod, e]) => {
@@ -1317,7 +1367,6 @@
     });
   }
 
-  // Intentar cargar desde cache al iniciar
   function iniciarCache() {
     const cached = cargarCache();
     if (cached) {
@@ -1326,9 +1375,12 @@
       setTimeout(() => input.focus(), 100);
     }
   }
+
   // ══════════════════════════════════════════════════════════════
-  let empleados  = {};
-  let estadoDia  = {};
+  //  ESTADO GLOBAL
+  // ══════════════════════════════════════════════════════════════
+  let empleados   = {};
+  let estadoDia   = {};
   let movimientos = [];
 
   // ══════════════════════════════════════════════════════════════
@@ -1395,7 +1447,7 @@
       try {
         if (!data.ok) throw new Error(data.error || 'Error desconocido');
         aplicarEmpleados(data.empleados);
-        guardarCache(data.empleados); // guardar en cache
+        guardarCache(data.empleados);
         const total = Object.keys(empleados).length;
         mostrarMensaje('ok', total + ' empleados cargados correctamente');
       } catch(err) {
@@ -1434,16 +1486,12 @@
     if (Object.keys(empleados).length === 0) {
       mostrarMensaje('error', 'Primero actualice la lista de empleados'); return;
     }
-
-    // Anti doble escaneo
     if (esDuplicado(codigo)) {
-      mostrarMensaje('warn', 'Lectura duplicada ignorada — espere un momento');
-      return;
+      mostrarMensaje('warn', 'Lectura duplicada ignorada — espere un momento'); return;
     }
-
     const emp = empleados[codigo];
-    if (!emp)                        { mostrarMensaje('error', 'Codigo no encontrado: ' + codigo); return; }
-    if (emp.estado !== 'ACTIVO')     { mostrarMensaje('warn',  emp.nombre + ' esta inactivo'); return; }
+    if (!emp)                    { mostrarMensaje('error', 'Codigo no encontrado: ' + codigo); return; }
+    if (emp.estado !== 'ACTIVO') { mostrarMensaje('warn',  emp.nombre + ' esta inactivo'); return; }
 
     mostrarMensaje('warn', 'Registrando...');
     try {
@@ -1460,7 +1508,10 @@
       beep(tipo === 'INGRESO' ? 'ingreso' : 'salida');
       estadoDia[codigo] = tipo;
       actualizarContador();
-      agregarMovimiento({ hora: new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}), codigo, nombre: emp.nombre, sector: emp.sector, movimiento: tipo });
+      agregarMovimiento({
+        hora: new Date().toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false }),
+        codigo, nombre: emp.nombre, sector: emp.sector, movimiento: tipo
+      });
     } catch(err) {
       mostrarMensaje('error', 'Error: ' + err.message);
     }
@@ -1494,13 +1545,13 @@
   }
 
   // ══════════════════════════════════════════════════════════════
-  //  CREDENCIAL — dibuja el carnet en Canvas y genera QR
+  //  CREDENCIAL
   // ══════════════════════════════════════════════════════════════
   let credEmpleadoCodigo = null;
 
   function abrirCredencial(cod) {
     credEmpleadoCodigo = cod;
-    document.getElementById('modalCredencial').classList.remove('hidden');
+    abrirModal('modalCredencial');
     dibujarCarnet(cod);
   }
 
@@ -1509,22 +1560,12 @@
     const canvas = document.getElementById('carnetCanvas');
     const ctx    = canvas.getContext('2d');
     const W = 300, H = 500;
-    canvas.width  = W;
-    canvas.height = H;
+    canvas.width = W; canvas.height = H;
 
     ctx.save();
-    roundRect(ctx, 0, 0, W, H, 16);
-    ctx.clip();
-
-    // Fondo blanco
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, W, H);
-
-    // Header negro
-    ctx.fillStyle = '#0d1117';
-    ctx.fillRect(0, 0, W, 90);
-
-    // Logo BLACK
+    roundRect(ctx, 0, 0, W, H, 16); ctx.clip();
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, W, 90);
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 28px Segoe UI, sans-serif';
     ctx.textAlign = 'center';
@@ -1532,91 +1573,54 @@
     ctx.font = '11px Segoe UI, sans-serif';
     ctx.fillStyle = '#8b949e';
     ctx.fillText('MAYORISTA', W / 2, 64);
-
-    // Línea azul
     ctx.fillStyle = '#1f6feb';
     ctx.fillRect(0, 90, W, 3);
 
-    // Foto placeholder
     const cx = W / 2, cy = 158, r = 50;
-    ctx.fillStyle = '#e8edf2';
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#d0d7de';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    ctx.fillStyle = '#e8edf2'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#d0d7de'; ctx.lineWidth = 2; ctx.stroke();
     ctx.fillStyle = '#9198a1';
-    ctx.beginPath();
-    ctx.arc(cx, cy - 10, 17, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(cx, cy + 28, 25, 19, 0, Math.PI, 0);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy - 10, 17, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx, cy + 28, 25, 19, 0, Math.PI, 0); ctx.fill();
 
-    // Nombre
     ctx.fillStyle = '#0d1117';
     ctx.font = 'bold 15px Segoe UI, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText((emp?.nombre || '---').toUpperCase(), W / 2, 238);
-
-    // Sector
     ctx.fillStyle = '#57606a';
     ctx.font = '12px Segoe UI, sans-serif';
     ctx.fillText((emp?.sector || '').toUpperCase(), W / 2, 258);
 
-    // Separador
-    ctx.strokeStyle = '#d0d7de';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(40, 274); ctx.lineTo(W - 40, 274);
-    ctx.stroke();
+    ctx.strokeStyle = '#d0d7de'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(40, 274); ctx.lineTo(W - 40, 274); ctx.stroke();
 
-    // Código label
-    ctx.fillStyle = '#57606a';
-    ctx.font = '10px Segoe UI, sans-serif';
+    ctx.fillStyle = '#57606a'; ctx.font = '10px Segoe UI, sans-serif';
     ctx.fillText('CODIGO DE EMPLEADO', W / 2, 294);
-
-    // Código valor
-    ctx.fillStyle = '#1f6feb';
-    ctx.font = 'bold 20px monospace';
+    ctx.fillStyle = '#1f6feb'; ctx.font = 'bold 20px monospace';
     ctx.fillText(cod, W / 2, 318);
-
     ctx.restore();
 
-    // QR más grande (130x130)
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${cod}&bgcolor=ffffff&color=0d1117&format=png`;
     const qrImg = new Image();
     qrImg.crossOrigin = 'anonymous';
     qrImg.onload = () => {
-      ctx.save();
-      roundRect(ctx, 0, 0, W, H, 16);
-      ctx.clip();
+      ctx.save(); roundRect(ctx, 0, 0, W, H, 16); ctx.clip();
       ctx.drawImage(qrImg, W / 2 - 65, 332, 130, 130);
-
-      // Footer
-      ctx.fillStyle = '#57606a';
-      ctx.font = '9px Segoe UI, sans-serif';
+      ctx.fillStyle = '#57606a'; ctx.font = '9px Segoe UI, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('ESCANEAR PARA REGISTRAR ASISTENCIA', W / 2, 478);
       ctx.restore();
     };
     qrImg.onerror = () => {
-      ctx.save();
-      roundRect(ctx, 0, 0, W, H, 16);
-      ctx.clip();
-      ctx.fillStyle = '#f0f0f0';
-      ctx.fillRect(W / 2 - 65, 332, 130, 130);
-      ctx.fillStyle = '#57606a';
-      ctx.font = '10px Segoe UI';
-      ctx.textAlign = 'center';
+      ctx.save(); roundRect(ctx, 0, 0, W, H, 16); ctx.clip();
+      ctx.fillStyle = '#f0f0f0'; ctx.fillRect(W / 2 - 65, 332, 130, 130);
+      ctx.fillStyle = '#57606a'; ctx.font = '10px Segoe UI'; ctx.textAlign = 'center';
       ctx.fillText('QR NO DISPONIBLE', W / 2, 400);
       ctx.restore();
     };
     qrImg.src = qrUrl;
   }
 
-  // Helper roundRect para canvas
   function roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -1642,17 +1646,17 @@
   }
 
   function compartirWhatsApp() {
-    const canvas = document.getElementById('carnetCanvas');
+    descargarCredencial();
     const emp    = empleados[credEmpleadoCodigo];
     const nombre = emp?.nombre || credEmpleadoCodigo;
-    // En mobile abre WhatsApp con mensaje, la imagen se descarga primero
-    descargarCredencial();
-    const texto = encodeURIComponent(`Credencial de empleado — ${nombre}\nCodigo: ${credEmpleadoCodigo}`);
-    setTimeout(() => {
-      window.open(`https://wa.me/?text=${texto}`, '_blank');
-    }, 500);
+    const texto  = encodeURIComponent(`Credencial de empleado — ${nombre}\nCodigo: ${credEmpleadoCodigo}`);
+    setTimeout(() => window.open(`https://wa.me/?text=${texto}`, '_blank'), 500);
   }
-  let empEditandoCodigo = null; // null = nuevo, string = editar
+
+  // ══════════════════════════════════════════════════════════════
+  //  EMPLEADOS — tabla, modales, baja/alta
+  // ══════════════════════════════════════════════════════════════
+  let empEditandoCodigo = null;
   let empBajaCodigo     = null;
 
   function renderTablaEmpleados(lista) {
@@ -1668,8 +1672,8 @@
         <td style="color:var(--muted)">${e.sector}</td>
         <td><span class="status-dot ${e.estado.toLowerCase()}">${e.estado === 'ACTIVO' ? 'Activo' : 'Inactivo'}</span></td>
         <td style="display:flex;gap:4px;padding:8px 20px;flex-wrap:nowrap;align-items:center">
-          <button class="action-btn edit"  onclick="abrirModalEditar('${cod}')">Editar</button>
-          <button class="action-btn cred"  onclick="abrirCredencial('${cod}')">Credencial</button>
+          <button class="action-btn edit" onclick="abrirModalEditar('${cod}')">Editar</button>
+          <button class="action-btn cred" onclick="abrirCredencial('${cod}')">Credencial</button>
           ${e.estado === 'ACTIVO'
             ? `<button class="action-btn baja" onclick="abrirModalBaja('${cod}')">Dar de baja</button>`
             : `<button class="action-btn alta" onclick="darDeAlta('${cod}')">Dar de alta</button>`
@@ -1703,55 +1707,51 @@
     renderTablaEmpleados(lista);
   }
 
-  // Abrir modal nuevo
   function abrirModalNuevo() {
     empEditandoCodigo = null;
     document.getElementById('modalTitulo').textContent = 'Nuevo empleado';
-    document.getElementById('mCodigo').value  = '';
+    document.getElementById('mCodigo').value    = '';
     document.getElementById('mCodigo').disabled = false;
-    document.getElementById('mNombre').value  = '';
-    document.getElementById('mSector').value  = 'Deposito';
-    document.getElementById('mEstado').value  = 'ACTIVO';
-    document.getElementById('modalEmpleado').classList.remove('hidden');
+    document.getElementById('mNombre').value    = '';
+    document.getElementById('mSector').value    = 'Deposito';
+    document.getElementById('mEstado').value    = 'ACTIVO';
+    abrirModal('modalEmpleado');
   }
 
-  // Abrir modal editar
   function abrirModalEditar(cod) {
     const e = empleados[cod];
     if (!e) return;
     empEditandoCodigo = cod;
     document.getElementById('modalTitulo').textContent = 'Editar empleado';
     document.getElementById('mCodigo').value    = cod;
-    document.getElementById('mCodigo').disabled = true; // no se puede cambiar el codigo
+    document.getElementById('mCodigo').disabled = true;
     document.getElementById('mNombre').value    = e.nombre;
     document.getElementById('mSector').value    = e.sector;
     document.getElementById('mEstado').value    = e.estado;
-    document.getElementById('modalEmpleado').classList.remove('hidden');
+    abrirModal('modalEmpleado');
   }
 
-  // Guardar (nuevo o edición) — por ahora solo en memoria
   function guardarEmpleado() {
     const cod    = document.getElementById('mCodigo').value.trim();
     const nombre = document.getElementById('mNombre').value.trim();
     const sector = document.getElementById('mSector').value;
     const estado = document.getElementById('mEstado').value;
-
     if (!cod || !nombre) { alert('Complete codigo y nombre'); return; }
-
     empleados[cod] = { nombre, sector, estado };
     guardarCache(Object.entries(empleados).map(([codigo, e]) => ({ codigo, ...e })));
     actualizarStatsEmpleados();
     cerrarModal('modalEmpleado');
   }
 
-  // Baja
+  // ✅ CORREGIDO: ahora usa abrirModal() para mostrar el overlay correctamente
   function abrirModalBaja(cod) {
     empBajaCodigo = cod;
-    const emp = empleados[cod];
-    const nombre = emp?.nombre || emp?.Nombre || cod;
+    const emp    = empleados[cod];
+    const nombre = emp?.nombre || cod;
     document.getElementById('bajaEmpleadoNombre').textContent = nombre;
-    document.getElementById('modalBaja').classList.remove('hidden');
+    abrirModal('modalBaja');
   }
+
   function confirmarBaja() {
     if (empBajaCodigo && empleados[empBajaCodigo]) {
       empleados[empBajaCodigo].estado = 'INACTIVO';
@@ -1762,7 +1762,6 @@
     cerrarModal('modalBaja');
   }
 
-  // Alta
   function darDeAlta(cod) {
     if (empleados[cod]) {
       empleados[cod].estado = 'ACTIVO';
@@ -1772,15 +1771,25 @@
     }
   }
 
-  function cerrarModal(id) {
-    document.getElementById(id).classList.add('hidden');
+  // ✅ Helpers modales unificados con clase .visible
+  function abrirModal(id) {
+    document.getElementById(id).classList.add('visible');
   }
+  function cerrarModal(id) {
+    document.getElementById(id).classList.remove('visible');
+  }
+
+  // Cerrar modal al click en overlay
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === this) cerrarModal(this.id);
+    });
+  });
 
   // ══════════════════════════════════════════════════════════════
   //  REPORTES — placeholder
   // ══════════════════════════════════════════════════════════════
   function aplicarFiltro() {
-    // Por implementar — conectar con Apps Script
     document.getElementById('rTotalDias').textContent  = '--';
     document.getElementById('rTotalHoras').textContent = '--';
     document.getElementById('rPromHoras').textContent  = '--';
@@ -1788,16 +1797,15 @@
   }
 
   function exportarExcel() {
-    // Por implementar
     alert('Exportacion proximamente disponible');
   }
 
-  // Setear fechas por defecto (hoy)
+  // Fechas por defecto
   const hoy = new Date().toISOString().split('T')[0];
   document.getElementById('fDesde').value = hoy;
   document.getElementById('fHasta').value = hoy;
 
-  // Cargar empleados desde cache si está disponible
+  // Cargar desde cache al iniciar
   if (sessionStorage.getItem('auth') === '1') iniciarCache();
 </script>
 </body>
